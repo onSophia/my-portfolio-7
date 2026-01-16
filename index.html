@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="PawShop Харьков - зоотовары и помощь животным. Корма, игрушки и поиск дома для питомцев.">
+    <meta name="keywords" content="зоомагазин Харьков, корм для собак, приют для животных, купить корм">
+    <title>PawShop Харьков | Зоомаркет и Добро</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;500;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="style.css" rel="stylesheet">
+</head>
+
+<body>
+    <canvas id="bg-canvas"></canvas>
+    <audio id="bgSound" loop>
+        <source src="https://cdn.freesound.org/previews/369/369947_5264628-lq.mp3" type="audio/mpeg">
+    </audio>
+
+    <div id="preloader">
+        <div class="paw-print"><i class="fas fa-paw"></i></div>
+        <h2 style="margin-bottom: 10px;">PawShop Харьков</h2>
+        <p style="color:gray; font-size: 0.9rem;">Загружаем товары и виляем хвостом...</p>
+
+    </div>
+
+    <header>
+        <a href="#" class="logo">Paw<span>Shop</span></a>
+        <div class="header-search">
+            <i class="fas fa-search"></i>
+            <input type="text" id="searchInput" placeholder="Поиск (Royal Canin, игрушка)..." oninput="applyFilters()"
+                aria-label="Поиск товаров">
+        </div>
+        <div class="nav-actions">
+            <i class="fas fa-volume-up sound-toggle" id="soundToggle" onclick="toggleSound()" title="Вкл/Выкл звук"></i>
+            <div class="cart-trigger" onclick="toggleCart()" aria-label="Корзина">
+                <i class="fas fa-shopping-bag"></i>
+                <span class="cart-count" id="cartBadge">0</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="overlay" id="overlay" onclick="closeAll()"></div>
+
+    <div class="cart-panel" id="cartPanel">
+        <div
+            style="padding: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); display:flex; justify-content:space-between;">
+            <h3>Корзина</h3>
+            <i class="fas fa-times" style="cursor:pointer" onclick="toggleCart()"></i>
+        </div>
+        <div class="cart-items" id="cartItems"></div>
+        <div class="cart-footer">
+            <div
+                style="display: flex; justify-content: space-between; margin-bottom: 15px; font-size: 1.2rem; font-weight: bold;">
+                <span>Итого:</span>
+                <span id="cartTotal">0 ₴</span>
+            </div>
+            <button class="cta-btn" style="width: 100%; justify-content: center; border-radius: 10px;"
+                onclick="openCheckout()">Оформить заказ</button>
+        </div>
+    </div>
+
+    <div id="checkoutModal">
+        <h2 style="margin-bottom: 20px; text-align: center;">Оформление</h2>
+        <form onsubmit="submitOrder(event)">
+            <input type="text" class="form-input" required placeholder="Ваше Имя">
+            <input type="tel" class="form-input" required placeholder="Телефон">
+            <input type="text" class="form-input" required placeholder="Адрес доставки (Харьков)">
+            <button type="submit" class="cta-btn"
+                style="width: 100%; border-radius: 10px; display:flex; justify-content:center;">
+                <span id="btnText">Заказать</span>
+                <div class="spinner" id="btnLoader"></div>
+            </button>
+        </form>
+    </div>
+
+    <div id="supportModal">
+        <div style="text-align: center;">
+            <i class="fas fa-hand-holding-heart"
+                style="font-size: 3rem; color: var(--secondary); margin-bottom: 20px;"></i>
+            <h2 style="margin-bottom: 10px;">Поддержать приют</h2>
+            <p style="color: #aaa; margin-bottom: 20px; font-size: 0.9rem;">
+                Мы сотрудничаем с харьковскими приютами. Все донаты идут на корм и лекарства.
+            </p>
+            <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+                <p style="font-family: monospace; font-size: 1.1rem;">UA00 0000 0000 0000 0000</p>
+                <small style="color: var(--gray);">Банк "Монобанк"</small>
+            </div>
+            <button class="cta-btn"
+                style="background: #222; border: 1px solid #444; width: 100%; justify-content: center;"
+                onclick="closeAll()">
+                Я волонтер (написать)
+            </button>
+        </div>
+    </div>
+
+    <div id="productModal">
+        <div class="pm-close" onclick="closeProduct()" aria-label="Закрыть">
+            <i class="fas fa-times"></i>
+        </div>
+
+        <div class="pm-img-col">
+            <img id="pmImg" src="" alt="">
+        </div>
+        <div class="pm-info-col">
+            <div id="pmCat" class="pm-cat">Категория</div>
+            <h2 id="pmTitle" class="pm-title">Название</h2>
+            <div id="pmPrice" class="pm-price">0 ₴</div>
+
+            <div id="pmContent">
+                <p id="pmDesc" class="pm-desc">Описание...</p>
+            </div>
+
+            <button class="cta-btn" style="width: 100%; border-radius: 10px; margin-top: auto; justify-content: center;"
+                id="pmAddBtn">
+                В корзину
+            </button>
+        </div>
+    </div>
+
+    <div id="toast"><i class="fas fa-check-circle"></i> <span>Товар добавлен!</span></div>
+
+    <div class="support-btn" onclick="openSupport()">
+        <i class="fas fa-heart"></i> <span>Помочь</span>
+    </div>
+
+    <section class="hero">
+        <div>
+            <h1>Мир счастья<br>для всех <span>лапок</span></h1>
+            <p style="color:var(--gray); margin-bottom:30px; font-size:1.1rem; max-width: 600px;">
+                От корма для рептилий до игрушек для енотов. <br>
+                Самый большой ассортимент в Харькове с доставкой до двери.
+            </p>
+            <a href="#adoption" class="cta-btn">
+                <i class="fas fa-home"></i> Найти друга
+            </a>
+            <a href="#shop" class="cta-btn"
+                style="background: transparent; border: 1px solid var(--primary); margin-left: 10px;">
+                Каталог
+            </a>
+        </div>
+    </section>
+
+    <section id="shop">
+        <div class="shop-header">
+            <div class="animal-scroll" id="animalFilterContainer"></div>
+            <div class="sub-filters">
+                <select class="custom-select" id="categorySelect" onchange="applyFilters()" aria-label="Категория">
+                    <option value="all">Все категории</option>
+                </select>
+                <select class="custom-select" id="sortSelect" onchange="applyFilters()" aria-label="Сортировка">
+                    <option value="default">Сортировка: Популярные</option>
+                    <option value="asc">Цена: Сначала дешевые</option>
+                    <option value="desc">Цена: Сначала дорогие</option>
+                    <option value="fav">❤️ Мои избранные</option>
+                </select>
+            </div>
+        </div>
+        <div class="grid" id="shopGrid">
+        </div>
+    </section>
+
+    <section id="adoption" class="adopt-section">
+        <div class="adopt-header">
+            <h2>Они ищут дом <i class="fas fa-heart" style="color:var(--heart); font-size: 1.5rem;"></i></h2>
+            <p style="color: var(--gray);">Эти хвостики сейчас в приютах Харькова. Подарите им семью!</p>
+        </div>
+        <div class="grid" id="adoptGrid">
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-grid">
+            <div class="footer-col">
+                <h3>PawShop Харьков</h3>
+                <p style="color:var(--gray); line-height:1.6;">Мегамаркет зоотоваров. Мы поддерживаем приюты и
+                    волонтеров Харькова.</p>
+            </div>
+            <div class="footer-col">
+                <h3>Контакты</h3>
+                <ul>
+                    <li>📍 Харьков, ул. Сумская, 10</li>
+                    <li>📞 +380 57 700 00 00</li>
+                    <li>📧 info@pawshop.kh.ua</li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="script.js"></script>
+
+</body>
+
+</html>
