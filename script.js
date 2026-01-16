@@ -147,8 +147,7 @@ let soundEnabled = false;
 
 // STARTUP
 function startSite(withSound) {
-    // УДАЛЕНО: document.getElementById('preloader').style.opacity = '0';
-    // CSS сам скроет заставку через 2 секунды
+
 
     if (withSound) {
         soundEnabled = true;
@@ -158,13 +157,11 @@ function startSite(withSound) {
         document.getElementById('soundToggle').classList.add('active');
     }
 
-    // Инициализация
     renderAnimalFilters();
     renderCategoryOptions();
     showSkeletons();
     renderAdoption();
 
-    // Загружаем товары
     setTimeout(() => {
         applyFilters();
     }, 1000);
@@ -365,11 +362,9 @@ function createFlyingIcon(x, y, char) {
     el.style.left = x + 'px';
     el.style.top = y + 'px';
 
-    // Цель: иконка корзины (справа вверху)
     const cartIcon = document.querySelector('.cart-trigger');
     const cartRect = cartIcon.getBoundingClientRect();
 
-    // Вычисляем смещение
     el.style.setProperty('--tx', (cartRect.left - x) + 'px');
     el.style.setProperty('--ty', (cartRect.top - y) + 'px');
 
@@ -389,14 +384,13 @@ function openProduct(id) {
     const catObj = categories.find(c => c.id === p.category);
     document.getElementById('pmCat').innerText = catObj ? catObj.label : 'Товар';
 
-    // Возвращаем стандартную кнопку и описание для обычных товаров
     document.getElementById('pmContent').innerHTML = `<p id="pmDesc" class="pm-desc">${getAutoDescription(p, catObj ? catObj.label : '')}</p>`;
 
     const btn = document.getElementById('pmAddBtn');
     btn.innerHTML = 'В корзину';
     btn.style.background = "var(--primary)";
     btn.onclick = (e) => {
-        addToCart(e, p.id, btn); // Передаем btn для анимации, хоть он внутри модалки
+        addToCart(e, p.id, btn);
         closeProduct();
     };
 
@@ -406,7 +400,7 @@ function openProduct(id) {
 
 function closeProduct() {
     document.getElementById('productModal').classList.remove('open');
-    // Закрываем оверлей только если нет открытой корзины
+
     if (!document.getElementById('cartPanel').classList.contains('open')) {
         document.getElementById('overlay').classList.remove('open');
     }
@@ -521,15 +515,14 @@ function showToast(msg, color = 'var(--secondary)') {
     t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3000);
 }
 
-// --- BACKGROUND 3D (PARALLAX EFFECT) ---
+// --- BACKGROUND 3D  ---
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('bg-canvas'), alpha: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 
-// Создаем частицы
 const geo = new THREE.BufferGeometry();
-const pos = new Float32Array(600 * 3); // 600 частиц
+const pos = new Float32Array(600 * 3);
 for (let i = 0; i < 600 * 3; i++) pos[i] = (Math.random() - 0.5) * 25;
 geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
 const mat = new THREE.PointsMaterial({ size: 0.04, color: 0xFF9F1C, transparent: true, opacity: 0.6 });
@@ -537,7 +530,7 @@ const points = new THREE.Points(geo, mat);
 scene.add(points);
 camera.position.z = 5;
 
-// Mouse Parallax
+
 let mouseX = 0; let mouseY = 0;
 document.addEventListener('mousemove', (e) => {
     mouseX = e.clientX / window.innerWidth - 0.5;
@@ -546,7 +539,6 @@ document.addEventListener('mousemove', (e) => {
 
 function animate() {
     requestAnimationFrame(animate);
-    // Плавное вращение + параллакс от мыши
     points.rotation.y += 0.001;
     points.rotation.x += 0.0005;
 
@@ -559,8 +551,8 @@ function animate() {
 animate();
 window.onresize = () => { camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); };
 
-// Запуск сайта сразу после загрузки страницы
+
 window.addEventListener('load', () => {
-    startSite(false); // Запускаем без звука, звук включится кнопкой в меню
+    startSite(false);
 });
 
